@@ -86,7 +86,7 @@
   .btn-sm { padding: 8px 14px; font-size: 13px; border-radius: 8px; }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
 
-  /* ── APP LAYOUT — mobile: body scrolls; tab bar fixed at bottom ── */
+  /* ── APP LAYOUT — mobile: .main scrolls; tab bar fixed at bottom ── */
   #app { display: none; }
   #app.visible { display: block; }
   .sidebar { display: none; position: fixed; top: 0; left: 0; bottom: 0; width: 240px; background: var(--surface); border-right: 1px solid var(--border); flex-direction: column; overflow-y: auto; z-index: 200; }
@@ -102,7 +102,8 @@
   .nav-item.active { background: var(--green-glow); color: var(--green); }
   .nav-item .nav-icon { font-size: 18px; width: 22px; text-align: center; }
   .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); }
-  .main { display: block; width: 100%; }
+  /* Mobile: .main is the scroll container, sized to viewport minus the 64px tab bar */
+  .main { display: block; width: 100%; height: calc(100vh - 64px); overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
   .page { display: none; padding: 16px 14px 90px; width: 100%; box-sizing: border-box; }
   .page.active { display: block; }
   .page-title { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1px; line-height: 1; margin-bottom: 4px; }
@@ -307,7 +308,7 @@
     body { overflow: hidden; }
     #app.visible { display: flex; flex-direction: row; height: 100vh; }
     .sidebar { display: flex !important; position: relative; top: auto; left: auto; bottom: auto; height: 100vh; }
-    .main { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+    .main { flex: 1; height: auto; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
     .bottom-tab-bar { display: none !important; }
     .page { padding: 28px 32px 60px !important; max-width: 900px !important; margin-left: auto !important; margin-right: auto !important; }
     .page-title { font-size: 42px !important; }
