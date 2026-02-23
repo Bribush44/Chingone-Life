@@ -192,6 +192,42 @@
   .streak-badge { display: flex; align-items: center; gap: 6px; background: rgba(250,204,21,0.1); border: 1px solid rgba(250,204,21,0.2); border-radius: var(--radius); padding: 10px 16px; margin-bottom: 16px; font-size: 13px; font-weight: 600; color: var(--accent); }
   .pr-badge { display: inline-block; padding: 1px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; background: rgba(250,204,21,0.15); color: var(--accent); border: 1px solid rgba(250,204,21,0.3); margin-left: 4px; }
 
+  /* ── WORKOUT MODAL FORM ── */
+  .activity-chip { padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text-dim); transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+  .activity-chip.active { background: var(--green); color: #0d0f0e; border-color: var(--green); }
+  .exercise-block { background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; }
+  .exercise-row-header { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; position: relative; }
+  .exercise-name-input { flex: 1; padding: 13px 14px; font-size: 16px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--surface); color: var(--text); font-family: 'DM Sans', sans-serif; outline: none; min-width: 0; }
+  .exercise-name-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-glow); }
+  .voice-btn { width: 46px; height: 46px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text-dim); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; transition: all 0.15s; }
+  .voice-btn.listening { border-color: var(--red); color: var(--red); background: rgba(248,113,113,0.1); animation: pulse-red 1s infinite; }
+  @keyframes pulse-red { 0%,100% { box-shadow: 0 0 0 0 rgba(248,113,113,0.4); } 50% { box-shadow: 0 0 0 6px rgba(248,113,113,0); } }
+  .del-exercise-btn { width: 38px; height: 38px; border-radius: 8px; border: 1px solid rgba(248,113,113,0.3); background: rgba(248,113,113,0.08); color: var(--red); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; transition: background 0.15s; }
+  .del-exercise-btn:hover { background: rgba(248,113,113,0.2); }
+  .exercise-muscles { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; min-height: 0; }
+  .muscle-tag { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; background: rgba(74,222,128,0.1); color: var(--green); border: 1px solid rgba(74,222,128,0.25); }
+  .ex-autocomplete { position: absolute; top: calc(100% + 2px); left: 0; right: 0; background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); z-index: 300; max-height: 220px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+  .ex-ac-item { padding: 12px 14px; cursor: pointer; font-size: 14px; border-bottom: 1px solid var(--border); transition: background 0.1s; display: flex; justify-content: space-between; align-items: center; }
+  .ex-ac-item:last-child { border-bottom: none; }
+  .ex-ac-item:hover { background: var(--surface2); color: var(--green); }
+  .ex-ac-muscles { font-size: 11px; color: var(--text-muted); }
+  .sets-grid { display: grid; grid-template-columns: 26px 1fr 1fr 1fr 30px; gap: 6px; align-items: center; margin-bottom: 6px; }
+  .sets-header { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); text-align: center; }
+  .set-num { font-size: 14px; font-weight: 700; color: var(--text-muted); text-align: center; }
+  .set-input { padding: 11px 4px; font-size: 16px; text-align: center; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); font-family: 'DM Sans', sans-serif; width: 100%; outline: none; -moz-appearance: textfield; }
+  .set-input:focus { border-color: var(--green); }
+  .set-input::-webkit-outer-spin-button, .set-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .del-set-btn { width: 28px; height: 28px; border-radius: 6px; border: none; background: rgba(248,113,113,0.1); color: var(--red); cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+  .del-set-btn:hover { background: rgba(248,113,113,0.25); }
+  .add-set-btn { width: 100%; padding: 10px; border-radius: 8px; border: 1.5px dashed var(--border); background: transparent; color: var(--text-dim); font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 4px; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+  .add-set-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-glow); }
+  .wm-totals-bar { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; padding: 12px 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 14px; }
+  .wm-total-item { display: flex; flex-direction: column; align-items: center; }
+  .wm-total-val { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--green); line-height: 1; }
+  .wm-total-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-top: 2px; }
+  .wm-autosave { font-size: 11px; color: var(--green); opacity: 0; transition: opacity 0.4s; margin-left: auto; }
+  .wm-autosave.show { opacity: 1; }
+
   /* ── AI PLAN ── */
   .ai-provider-card { display:flex; align-items:center; gap:12px; padding:14px 16px; border-radius:var(--radius); border:2px solid var(--border); background:var(--surface2); cursor:pointer; transition:all 0.2s; }
   .ai-provider-card:hover { border-color: var(--green); }
@@ -2819,6 +2855,23 @@
         <label>Calories Burned (est.)</label>
         <input type="number" id="wm-calories" placeholder="0" min="0">
       </div>
+    </div>
+
+    <!-- LIVE TOTALS BAR -->
+    <div class="wm-totals-bar" id="wm-totals-bar" style="display:none;">
+      <div class="wm-total-item">
+        <div class="wm-total-val" id="wm-total-weight">0</div>
+        <div class="wm-total-lbl">Total <span id="wm-total-weight-unit">lbs</span></div>
+      </div>
+      <div class="wm-total-item">
+        <div class="wm-total-val" id="wm-total-sets">0</div>
+        <div class="wm-total-lbl">Sets</div>
+      </div>
+      <div class="wm-total-item">
+        <div class="wm-total-val" id="wm-total-reps">0</div>
+        <div class="wm-total-lbl">Total Reps</div>
+      </div>
+      <span class="wm-autosave" id="wm-autosave">✓ Auto-saved</span>
     </div>
 
     <!-- EXERCISES TABLE -->
@@ -7701,6 +7754,13 @@ function refreshUnitLabels() {
   if (pgGWLbl) pgGWLbl.textContent = wUnit;
   const pgGWInput = document.getElementById('pg-goal-weight');
   if (pgGWInput) pgGWInput.placeholder = isMetric ? 'e.g. 75' : 'e.g. 165';
+
+  // Workout modal — weight column headers + totals unit (if modal is open)
+  document.querySelectorAll('[id^="wt-hdr-"]').forEach(el => { el.textContent = 'Wt (' + wUnit + ')'; });
+  const wmTotalUnit = document.getElementById('wm-total-weight-unit');
+  if (wmTotalUnit) wmTotalUnit.textContent = wUnit;
+  // Workout session cards — update lbs/kg in set summaries when re-rendered
+  if (document.getElementById('page-workout-log')?.classList.contains('active')) renderWorkoutLog();
 }
 
 function loadProfileFormUnits() {
@@ -8722,6 +8782,11 @@ function openAddWorkout() {
   document.getElementById('no-exercises-msg').style.display = 'block';
   // Add first exercise row by default
   addExerciseRow();
+  updateWorkoutTotals();
+  // Update unit labels in modal
+  const wUnit = weightUnit();
+  const wmUnit = document.getElementById('wm-total-weight-unit');
+  if (wmUnit) wmUnit.textContent = wUnit;
   document.getElementById('add-workout-modal').classList.add('open');
 }
 
@@ -8749,17 +8814,23 @@ function selectActivity(btn, name) {
 function addExerciseRow() {
   document.getElementById('no-exercises-msg').style.display = 'none';
   const id = exerciseRowCount++;
+  const wUnit = weightUnit();
   const row = document.createElement('div');
-  row.className = 'exercise-row';
+  row.className = 'exercise-block';
   row.id = 'ex-row-' + id;
   row.innerHTML = `
     <div class="exercise-row-header">
-      <input class="exercise-name-input" id="ex-name-${id}" placeholder="Exercise name (e.g. Bench Press, Squat, Deadlift...)" autocomplete="off">
-      <button type="button" class="del-exercise-btn" onclick="deleteExerciseRow(${id})" title="Remove exercise">✕</button>
+      <input class="exercise-name-input" id="ex-name-${id}" placeholder="Exercise name..." autocomplete="off"
+        oninput="filterExercises(${id},this.value);showExerciseMuscles(${id},this.value);saveWorkoutDraft()"
+        onblur="setTimeout(()=>{const d=document.getElementById('ex-ac-${id}');if(d)d.style.display='none';},180)">
+      <button type="button" class="voice-btn" id="ex-voice-${id}" onclick="startVoiceInput(${id})" title="Voice input">🎤</button>
+      <button type="button" class="del-exercise-btn" onclick="deleteExerciseRow(${id})" title="Remove">✕</button>
+      <div class="ex-autocomplete" id="ex-ac-${id}" style="display:none;"></div>
     </div>
+    <div class="exercise-muscles" id="ex-muscles-${id}"></div>
     <div class="sets-grid" style="margin-bottom:4px;">
       <div class="sets-header">#</div>
-      <div class="sets-header">Weight (lbs)</div>
+      <div class="sets-header" id="wt-hdr-${id}">Wt (${wUnit})</div>
       <div class="sets-header">Reps</div>
       <div class="sets-header">Notes</div>
       <div></div>
@@ -8768,7 +8839,8 @@ function addExerciseRow() {
     <button type="button" class="add-set-btn" onclick="addSetRow(${id})">＋ Add Set</button>
   `;
   document.getElementById('exercise-rows-container').appendChild(row);
-  addSetRow(id); // start with one set
+  addSetRow(id);
+  setTimeout(() => { const inp = document.getElementById('ex-name-' + id); if (inp) inp.focus(); }, 60);
 }
 
 function addSetRow(exId) {
@@ -8778,10 +8850,13 @@ function addSetRow(exId) {
   setDiv.className = 'sets-grid';
   setDiv.innerHTML = `
     <div class="set-num">${setNum}</div>
-    <input class="set-input" type="number" placeholder="0" min="0" step="2.5">
-    <input class="set-input" type="number" placeholder="0" min="0">
-    <input class="set-input" type="text" placeholder="notes" style="font-family:'DM Sans',sans-serif;text-align:left;padding-left:8px;">
-    <button type="button" class="del-set-btn" onclick="this.parentElement.remove();renumberSets(${exId})">✕</button>
+    <input class="set-input" type="number" placeholder="0" min="0" step="2.5"
+      oninput="updateWorkoutTotals();saveWorkoutDraft()">
+    <input class="set-input" type="number" placeholder="0" min="0"
+      oninput="updateWorkoutTotals();saveWorkoutDraft()">
+    <input class="set-input" type="text" placeholder="notes" style="text-align:left;padding-left:8px;"
+      oninput="saveWorkoutDraft()">
+    <button type="button" class="del-set-btn" onclick="this.parentElement.remove();renumberSets(${exId});updateWorkoutTotals();">✕</button>
   `;
   container.appendChild(setDiv);
 }
@@ -8800,6 +8875,231 @@ function deleteExerciseRow(id) {
   if (!document.getElementById('exercise-rows-container').children.length) {
     document.getElementById('no-exercises-msg').style.display = 'block';
   }
+  updateWorkoutTotals();
+}
+
+// ── Exercise Database ───────────────────────────
+const EXERCISE_DB = [
+  // Chest
+  { name: 'Bench Press',            muscles: ['Chest','Triceps','Front Deltoids'] },
+  { name: 'Incline Bench Press',    muscles: ['Upper Chest','Triceps','Front Deltoids'] },
+  { name: 'Decline Bench Press',    muscles: ['Lower Chest','Triceps'] },
+  { name: 'Dumbbell Fly',           muscles: ['Chest','Front Deltoids'] },
+  { name: 'Cable Fly',              muscles: ['Chest'] },
+  { name: 'Push-Up',                muscles: ['Chest','Triceps','Front Deltoids'] },
+  { name: 'Dips',                   muscles: ['Chest','Triceps'] },
+  { name: 'Chest Press Machine',    muscles: ['Chest','Triceps'] },
+  // Back
+  { name: 'Deadlift',               muscles: ['Lower Back','Glutes','Hamstrings','Traps'] },
+  { name: 'Sumo Deadlift',          muscles: ['Glutes','Quads','Lower Back'] },
+  { name: 'Pull-Up',                muscles: ['Lats','Biceps','Rear Deltoids'] },
+  { name: 'Chin-Up',                muscles: ['Lats','Biceps'] },
+  { name: 'Barbell Row',            muscles: ['Lats','Rhomboids','Biceps'] },
+  { name: 'Dumbbell Row',           muscles: ['Lats','Rhomboids','Biceps'] },
+  { name: 'Cable Row',              muscles: ['Lats','Rhomboids','Biceps'] },
+  { name: 'Lat Pulldown',           muscles: ['Lats','Biceps'] },
+  { name: 'T-Bar Row',              muscles: ['Lats','Rhomboids','Rear Deltoids'] },
+  { name: 'Face Pull',              muscles: ['Rear Deltoids','Rhomboids','Traps'] },
+  { name: 'Romanian Deadlift',      muscles: ['Hamstrings','Glutes','Lower Back'] },
+  { name: 'Good Morning',           muscles: ['Lower Back','Hamstrings','Glutes'] },
+  // Shoulders
+  { name: 'Overhead Press',         muscles: ['Front Deltoids','Lateral Deltoids','Triceps'] },
+  { name: 'Dumbbell Shoulder Press',muscles: ['Front Deltoids','Lateral Deltoids','Triceps'] },
+  { name: 'Arnold Press',           muscles: ['All Deltoids','Triceps'] },
+  { name: 'Lateral Raise',          muscles: ['Lateral Deltoids'] },
+  { name: 'Front Raise',            muscles: ['Front Deltoids'] },
+  { name: 'Rear Delt Fly',          muscles: ['Rear Deltoids','Rhomboids'] },
+  { name: 'Upright Row',            muscles: ['Lateral Deltoids','Traps'] },
+  { name: 'Shrugs',                 muscles: ['Traps'] },
+  // Biceps
+  { name: 'Bicep Curl',             muscles: ['Biceps'] },
+  { name: 'Hammer Curl',            muscles: ['Biceps','Brachialis'] },
+  { name: 'Incline Dumbbell Curl',  muscles: ['Biceps'] },
+  { name: 'Concentration Curl',     muscles: ['Biceps'] },
+  { name: 'Preacher Curl',          muscles: ['Biceps'] },
+  { name: 'Cable Curl',             muscles: ['Biceps'] },
+  { name: 'EZ Bar Curl',            muscles: ['Biceps','Brachialis'] },
+  // Triceps
+  { name: 'Tricep Pushdown',        muscles: ['Triceps'] },
+  { name: 'Overhead Tricep Extension', muscles: ['Triceps'] },
+  { name: 'Skull Crushers',         muscles: ['Triceps'] },
+  { name: 'Close-Grip Bench Press', muscles: ['Triceps','Chest'] },
+  { name: 'Tricep Kickback',        muscles: ['Triceps'] },
+  { name: 'Diamond Push-Up',        muscles: ['Triceps','Chest'] },
+  // Legs
+  { name: 'Squat',                  muscles: ['Quads','Glutes','Hamstrings'] },
+  { name: 'Front Squat',            muscles: ['Quads','Glutes'] },
+  { name: 'Goblet Squat',           muscles: ['Quads','Glutes'] },
+  { name: 'Leg Press',              muscles: ['Quads','Glutes','Hamstrings'] },
+  { name: 'Hack Squat',             muscles: ['Quads','Glutes'] },
+  { name: 'Bulgarian Split Squat',  muscles: ['Quads','Glutes','Hamstrings'] },
+  { name: 'Lunge',                  muscles: ['Quads','Glutes','Hamstrings'] },
+  { name: 'Walking Lunge',          muscles: ['Quads','Glutes','Hamstrings'] },
+  { name: 'Leg Curl',               muscles: ['Hamstrings'] },
+  { name: 'Leg Extension',          muscles: ['Quads'] },
+  { name: 'Hip Thrust',             muscles: ['Glutes','Hamstrings'] },
+  { name: 'Glute Bridge',           muscles: ['Glutes','Hamstrings'] },
+  { name: 'Calf Raise',             muscles: ['Calves'] },
+  { name: 'Seated Calf Raise',      muscles: ['Calves','Soleus'] },
+  { name: 'Box Jump',               muscles: ['Quads','Glutes','Calves'] },
+  { name: 'Step-Up',                muscles: ['Quads','Glutes'] },
+  { name: 'Leg Abduction',          muscles: ['Abductors','Glutes'] },
+  { name: 'Leg Adduction',          muscles: ['Adductors','Inner Thighs'] },
+  // Core
+  { name: 'Plank',                  muscles: ['Core','Abs'] },
+  { name: 'Side Plank',             muscles: ['Obliques','Core'] },
+  { name: 'Crunch',                 muscles: ['Abs'] },
+  { name: 'Sit-Up',                 muscles: ['Abs','Hip Flexors'] },
+  { name: 'Leg Raise',              muscles: ['Lower Abs','Hip Flexors'] },
+  { name: 'Russian Twist',          muscles: ['Obliques','Abs'] },
+  { name: 'Ab Rollout',             muscles: ['Abs','Core'] },
+  { name: 'Cable Crunch',           muscles: ['Abs'] },
+  { name: 'Hanging Leg Raise',      muscles: ['Abs','Hip Flexors'] },
+  { name: 'Mountain Climber',       muscles: ['Core','Abs','Hip Flexors'] },
+  { name: 'Bicycle Crunch',         muscles: ['Abs','Obliques'] },
+  // Compound / Full Body
+  { name: 'Power Clean',            muscles: ['Full Body','Traps','Glutes'] },
+  { name: 'Kettlebell Swing',       muscles: ['Glutes','Hamstrings','Core','Shoulders'] },
+  { name: 'Kettlebell Clean',       muscles: ['Full Body','Glutes'] },
+  { name: 'Burpee',                 muscles: ['Full Body','Chest','Quads'] },
+  { name: 'Farmer Walk',            muscles: ['Traps','Core','Forearms'] },
+  { name: 'Battle Ropes',           muscles: ['Shoulders','Core','Back'] },
+  { name: 'Clean and Press',        muscles: ['Full Body','Shoulders'] },
+  { name: 'Thruster',               muscles: ['Quads','Glutes','Shoulders','Triceps'] },
+  { name: 'Wrist Curl',             muscles: ['Forearms'] },
+];
+
+// ── Autocomplete ─────────────────────────────
+function filterExercises(exId, query) {
+  const dropdown = document.getElementById('ex-ac-' + exId);
+  if (!dropdown) return;
+  if (!query || query.length < 2) { dropdown.style.display = 'none'; return; }
+  const q = query.toLowerCase();
+  const matches = EXERCISE_DB.filter(e => e.name.toLowerCase().includes(q)).slice(0, 8);
+  if (!matches.length) { dropdown.style.display = 'none'; return; }
+  dropdown.innerHTML = matches.map(e =>
+    `<div class="ex-ac-item" onmousedown="selectExercise(${exId},'${e.name.replace(/'/g,"\\'")}')">
+       <span>${e.name}</span>
+       <span class="ex-ac-muscles">${e.muscles.slice(0, 2).join(', ')}</span>
+     </div>`
+  ).join('');
+  dropdown.style.display = 'block';
+}
+
+function selectExercise(exId, name) {
+  const input = document.getElementById('ex-name-' + exId);
+  if (input) input.value = name;
+  const dropdown = document.getElementById('ex-ac-' + exId);
+  if (dropdown) dropdown.style.display = 'none';
+  showExerciseMuscles(exId, name);
+  saveWorkoutDraft();
+}
+
+function showExerciseMuscles(exId, name) {
+  const el = document.getElementById('ex-muscles-' + exId);
+  if (!el) return;
+  const match = EXERCISE_DB.find(e => e.name.toLowerCase() === (name || '').toLowerCase());
+  if (!match) { el.innerHTML = ''; return; }
+  el.innerHTML = match.muscles.map(m => `<span class="muscle-tag">💪 ${m}</span>`).join('');
+}
+
+// ── Voice Input ───────────────────────────────
+let _speechRec = null;
+let _speechExId = null;
+
+function startVoiceInput(exId) {
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const btn = document.getElementById('ex-voice-' + exId);
+  if (!SpeechRec) {
+    if (btn) { btn.textContent = '✗'; setTimeout(() => { btn.textContent = '🎤'; }, 1500); }
+    return;
+  }
+  // Toggle off if already listening to this input
+  if (_speechRec && _speechExId === exId) {
+    _speechRec.stop(); return;
+  }
+  if (_speechRec) _speechRec.stop();
+  _speechExId = exId;
+  _speechRec = new SpeechRec();
+  _speechRec.lang = 'en-US';
+  _speechRec.interimResults = false;
+  _speechRec.maxAlternatives = 3;
+  if (btn) { btn.classList.add('listening'); btn.textContent = '⏹'; }
+  _speechRec.onresult = (e) => {
+    const transcript = e.results[0][0].transcript;
+    const input = document.getElementById('ex-name-' + exId);
+    if (input) {
+      input.value = transcript;
+      filterExercises(exId, transcript);
+      showExerciseMuscles(exId, transcript);
+      saveWorkoutDraft();
+    }
+  };
+  _speechRec.onend = () => {
+    _speechRec = null;
+    if (btn) { btn.classList.remove('listening'); btn.textContent = '🎤'; }
+  };
+  _speechRec.onerror = () => {
+    _speechRec = null;
+    if (btn) { btn.classList.remove('listening'); btn.textContent = '🎤'; }
+  };
+  _speechRec.start();
+}
+
+// ── Live Totals ───────────────────────────────
+function updateWorkoutTotals() {
+  let totalSets = 0, totalWeight = 0, totalReps = 0;
+  document.querySelectorAll('.exercise-block').forEach(block => {
+    block.querySelectorAll('.sets-grid').forEach(setRow => {
+      const inputs = setRow.querySelectorAll('.set-input');
+      if (inputs.length < 2) return;
+      const w = parseFloat(inputs[0].value) || 0;
+      const r = parseFloat(inputs[1].value) || 0;
+      if (w > 0 && r > 0) { totalSets++; totalWeight += w * r; totalReps += r; }
+    });
+  });
+  const bar = document.getElementById('wm-totals-bar');
+  if (bar) bar.style.display = totalSets > 0 ? 'flex' : 'none';
+  const el = document.getElementById('wm-total-weight');
+  if (el) el.textContent = Math.round(totalWeight).toLocaleString();
+  const sEl = document.getElementById('wm-total-sets');
+  if (sEl) sEl.textContent = totalSets;
+  const rEl = document.getElementById('wm-total-reps');
+  if (rEl) rEl.textContent = totalReps;
+}
+
+// ── Draft Auto-Save ───────────────────────────
+let _wmDraftTimer = null;
+function saveWorkoutDraft() {
+  clearTimeout(_wmDraftTimer);
+  _wmDraftTimer = setTimeout(() => {
+    try {
+      const exercises = [];
+      document.querySelectorAll('.exercise-block').forEach(block => {
+        const exId = block.id.replace('ex-row-', '');
+        const nameEl = document.getElementById('ex-name-' + exId);
+        const sets = [];
+        const sc = document.getElementById('ex-sets-' + exId);
+        if (sc) {
+          Array.from(sc.querySelectorAll('.sets-grid')).forEach(sr => {
+            const ins = sr.querySelectorAll('.set-input');
+            if (ins.length >= 2) sets.push({ weight: ins[0].value, reps: ins[1].value, notes: ins[2]?.value || '' });
+          });
+        }
+        if (nameEl) exercises.push({ name: nameEl.value, sets });
+      });
+      const draft = {
+        date: currentWorkoutDate,
+        activity: selectedActivity,
+        name: document.getElementById('wm-name')?.value || '',
+        duration: document.getElementById('wm-duration')?.value || '',
+        exercises
+      };
+      localStorage.setItem('wm_draft_' + currentUser, JSON.stringify(draft));
+      const savedEl = document.getElementById('wm-autosave');
+      if (savedEl) { savedEl.classList.add('show'); setTimeout(() => savedEl.classList.remove('show'), 1800); }
+    } catch(e) {}
+  }, 700);
 }
 
 function confirmAddWorkout() {
@@ -8808,7 +9108,7 @@ function confirmAddWorkout() {
     : selectedActivity;
 
   const exercises = [];
-  document.querySelectorAll('.exercise-row').forEach(row => {
+  document.querySelectorAll('.exercise-block').forEach(row => {
     const exId = row.id.replace('ex-row-', '');
     const nameEl = document.getElementById('ex-name-' + exId);
     const name = nameEl ? nameEl.value.trim() : '';
@@ -8846,6 +9146,7 @@ function confirmAddWorkout() {
   if (!u.workoutLog[currentWorkoutDate]) u.workoutLog[currentWorkoutDate] = [];
   u.workoutLog[currentWorkoutDate].push(workout);
   saveStorage();
+  try { localStorage.removeItem('wm_draft_' + currentUser); } catch(e) {}
   closeWorkoutModal();
   renderWorkoutLog();
 }
