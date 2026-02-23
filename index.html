@@ -102,7 +102,7 @@
   .nav-item.active { background: var(--green-glow); color: var(--green); }
   .nav-item .nav-icon { font-size: 18px; width: 22px; text-align: center; }
   .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); }
-  .main { width: 100%; overflow-y: auto; overflow-x: hidden; background: var(--bg); height: calc(100svh - 64px); -webkit-overflow-scrolling: touch; }
+  .main { width: 100%; overflow-y: auto; overflow-x: hidden; background: var(--bg); height: calc(100svh - 64px); min-height: 0; flex-shrink: 0; -webkit-overflow-scrolling: touch; }
   .page { display: none; padding: 16px 14px 120px; max-width: 100%; width: 100%; box-sizing: border-box; }
   .page.active { display: block; }
   .page-title { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1px; line-height: 1; margin-bottom: 4px; }
@@ -578,7 +578,7 @@
   <div class="sidebar">
     <div class="sidebar-logo" style="display:flex;align-items:baseline;gap:8px;">
     Chingone Life Tracker
-    <span id="version-badge" style="font-size:9px;font-weight:700;letter-spacing:0.4px;background:rgba(74,222,128,0.15);color:var(--green);border:1px solid rgba(74,222,128,0.3);border-radius:20px;padding:2px 6px;font-family:'DM Sans',sans-serif;">v1.1.0</span>
+    <span id="version-badge" style="font-size:9px;font-weight:700;letter-spacing:0.4px;background:rgba(74,222,128,0.15);color:var(--green);border:1px solid rgba(74,222,128,0.3);border-radius:20px;padding:2px 6px;font-family:'DM Sans',sans-serif;">v1.2.0</span>
   </div>
     <div class="sidebar-user">
       <div class="user-chip" onclick="navigate('users')">
@@ -3101,8 +3101,8 @@
 
 <script>
   // ── App Version ──────────────────────────────────────────────
-  const APP_VERSION = '1.1.0';
-  const APP_VERSION_DATE = '2026-02-20';
+  const APP_VERSION = '1.2.0';
+  const APP_VERSION_DATE = '2026-02-23';
   // ────────────────────────────────────────────────────────────
   // Update version badges after DOM loads
   document.addEventListener('DOMContentLoaded', () => {
