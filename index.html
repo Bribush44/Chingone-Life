@@ -1292,15 +1292,15 @@
         <div class="ai-form-grid">
           <div class="form-group">
             <label>Bedtime</label>
-            <input type="time" id="sl-bedtime" value="22:30">
+            <input type="time" id="sl-bedtime" value="22:30" oninput="_saveSlDraft()">
           </div>
           <div class="form-group">
             <label>Wake Time</label>
-            <input type="time" id="sl-waketime" value="06:30">
+            <input type="time" id="sl-waketime" value="06:30" oninput="_saveSlDraft()">
           </div>
           <div class="form-group">
             <label>Sleep Quality</label>
-            <select id="sl-quality-input">
+            <select id="sl-quality-input" onchange="_saveSlDraft()">
               <option value="">— Select —</option>
               <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
               <option value="4">⭐⭐⭐⭐ Good</option>
@@ -1311,7 +1311,7 @@
           </div>
           <div class="form-group">
             <label>Feeling on Wake</label>
-            <select id="sl-feeling">
+            <select id="sl-feeling" onchange="_saveSlDraft()">
               <option value="">— Select —</option>
               <option value="Refreshed">😊 Refreshed</option>
               <option value="Okay">😐 Okay</option>
@@ -1322,7 +1322,7 @@
           </div>
           <div class="form-group full">
             <label>Notes (optional)</label>
-            <input type="text" id="sl-notes" placeholder="e.g. woke up twice, had caffeine late, great recovery...">
+            <input type="text" id="sl-notes" placeholder="e.g. woke up twice, had caffeine late, great recovery..." oninput="_saveSlDraft()">
           </div>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
@@ -3096,7 +3096,7 @@
 
     <div class="form-group">
       <label>Food Name <span style="color:var(--red)">*</span></label>
-      <input type="text" id="mf-name" placeholder="e.g. Mom's Chicken Soup, Protein Bar, etc.">
+      <input type="text" id="mf-name" placeholder="e.g. Mom's Chicken Soup, Protein Bar, etc." oninput="_saveMFDraft()">
     </div>
     <div class="form-group">
       <label>Brand / Notes (optional)</label>
@@ -3199,6 +3199,12 @@
     const vs = document.getElementById('settings-version-lbl');
     if (vs) vs.textContent = 'v' + APP_VERSION + '\n' + APP_VERSION_DATE;
   });
+
+  // Auto-save drafts when app is hidden (phone call, home button, tab switch, etc.)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') saveAllDrafts();
+  });
+  window.addEventListener('pagehide', saveAllDrafts);
 
 // ── IMMEDIATE STARTUP: purge any stale error HTML saved as aiPlan ──
 (function() {
@@ -3585,6 +3591,73 @@ function loadStorage() {
 function saveStorage() {
   localStorage.setItem('vt_users', JSON.stringify(allUsers));
   if (gSheetsConfig) localStorage.setItem('vt_sheets', JSON.stringify(gSheetsConfig));
+}
+
+// ══════════════════════════════════════════════
+// AUTO-SAVE DRAFT SYSTEM
+// Preserves in-progress form data across app closures, phone calls,
+// and accidental navigation. Drafts are cleared on successful save.
+// ══════════════════════════════════════════════
+
+function _draftKey(form) { return 'asdraft_' + form + '_' + (currentUser || ''); }
+function _saveDraft(form, data) {
+  try { localStorage.setItem(_draftKey(form), JSON.stringify(data)); } catch(e) {}
+}
+function _loadDraft(form) {
+  try { return JSON.parse(localStorage.getItem(_draftKey(form)) || 'null'); } catch(e) { return null; }
+}
+function _clearDraft(form) {
+  try { localStorage.removeItem(_draftKey(form)); } catch(e) {}
+}
+
+// Called when app is hidden (phone call, tab switch, home button, etc.)
+function saveAllDrafts() {
+  try {
+    if (document.getElementById('add-workout-modal')?.classList.contains('open')) saveWorkoutDraft();
+    if (document.getElementById('manual-food-modal')?.classList.contains('open')) _saveMFDraft();
+    if (document.getElementById('page-sleep-log')?.classList.contains('active')) _saveSlDraft();
+  } catch(e) {}
+}
+
+// ── Manual Food Entry Draft ────────────────────
+const _MF_IDS = ['mf-name','mf-brand','mf-kcal','mf-serving','mf-serving-unit',
+                 'mf-protein','mf-carbs','mf-fat','mf-fiber','mf-sugar','mf-sodium',
+                 'mf-meal','mf-servings'];
+function _saveMFDraft() {
+  const d = {};
+  _MF_IDS.forEach(id => { const el = document.getElementById(id); if (el) d[id] = el.value; });
+  if (d['mf-name']) _saveDraft('mf', d);
+}
+function _restoreMFDraft() {
+  const d = _loadDraft('mf');
+  if (!d || !d['mf-name']) return false;
+  _MF_IDS.forEach(id => { const el = document.getElementById(id); if (el && d[id] !== undefined) el.value = d[id]; });
+  return true;
+}
+
+// ── Sleep Log Draft ────────────────────────────
+function _saveSlDraft() {
+  const d = {
+    date:    currentSleepDate,
+    bedtime: document.getElementById('sl-bedtime')?.value || '',
+    wake:    document.getElementById('sl-waketime')?.value || '',
+    quality: document.getElementById('sl-quality-input')?.value || '',
+    feeling: document.getElementById('sl-feeling')?.value || '',
+    notes:   document.getElementById('sl-notes')?.value || ''
+  };
+  if (d.bedtime !== '22:30' || d.wake !== '06:30' || d.quality || d.notes) _saveDraft('sl_' + currentSleepDate, d);
+}
+function _restoreSlDraft() {
+  const existing = (allUsers[currentUser]?.sleepLog || {})[currentSleepDate];
+  if (existing) return false; // already saved — don't overwrite with draft
+  const d = _loadDraft('sl_' + currentSleepDate);
+  if (!d) return false;
+  if (d.bedtime) document.getElementById('sl-bedtime').value = d.bedtime;
+  if (d.wake)    document.getElementById('sl-waketime').value = d.wake;
+  if (d.quality) document.getElementById('sl-quality-input').value = d.quality;
+  if (d.feeling) document.getElementById('sl-feeling').value = d.feeling;
+  if (d.notes)   document.getElementById('sl-notes').value = d.notes;
+  return !!(d.quality || d.notes || (d.bedtime && d.bedtime !== '22:30'));
 }
 
 // ══════════════════════════════════════════════
@@ -4591,6 +4664,7 @@ function logSleep() {
     hours: calcSleepHours(bedtime, waketime), loggedAt: new Date().toISOString() };
 
   saveStorage();
+  _clearDraft('sl_' + currentSleepDate);
   updateSleepStats();
   renderSleepChart();
   renderSleepInsights();
@@ -5848,6 +5922,7 @@ function confirmManualFood() {
 
   u.foodLog[currentLogDate][meal].push(entry);
   saveStorage();
+  _clearDraft('mf');
   closeManualModal();
   renderFoodLog();
   if (gSheetsConfig && gSheetsConfig.connected) syncEntryToSheets(entry, meal, totalQty);
@@ -6135,10 +6210,11 @@ function renderWpDayDetail(idx) {
         + (w.focus ? '<span class="wp-workout-chip">🎯 ' + escHtml(w.focus) + '</span>' : '')
         + '</div>'
         + (w.exercises.length
-          ? '<div style="font-size:12px;color:var(--text-dim);">'
+          ? '<div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">'
             + w.exercises.map(ex => '<div style="padding:4px 0;border-bottom:1px solid var(--border);">• ' + escHtml(ex) + '</div>').join('')
             + '</div>'
-          : '<div style="font-size:12px;color:var(--text-muted);">See your full AI plan for detailed exercises.</div>');
+          : '<div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">See your full AI plan for detailed exercises.</div>')
+        + '<button class="btn btn-primary btn-full" style="font-size:14px;padding:13px;" onclick="openWorkoutFromPlan(' + idx + ')">🏋️ Start This Workout →</button>';
     }
   }
 }
@@ -8829,8 +8905,54 @@ function openAddWorkout() {
   document.getElementById('exercise-rows-container').innerHTML = '';
   exerciseRowCount = 0;
   document.getElementById('no-exercises-msg').style.display = 'block';
-  // Add first exercise row by default
-  addExerciseRow();
+
+  // Try to restore a saved draft for this date
+  try {
+    const draft = JSON.parse(localStorage.getItem('wm_draft_' + currentUser) || 'null');
+    if (draft && draft.date === currentWorkoutDate && draft.exercises && draft.exercises.length) {
+      // Restore activity
+      if (draft.activity) {
+        selectedActivity = draft.activity;
+        document.querySelectorAll('.activity-chip').forEach(c => {
+          c.classList.toggle('active', c.textContent.trim() === draft.activity || c.textContent.includes(draft.activity));
+        });
+      }
+      if (draft.name) document.getElementById('wm-name').value = draft.name;
+      if (draft.duration) document.getElementById('wm-duration').value = draft.duration;
+      // Restore exercise rows
+      draft.exercises.forEach(ex => {
+        addExerciseRow();
+        const id = exerciseRowCount - 1;
+        const nameInput = document.getElementById('ex-name-' + id);
+        if (nameInput && ex.name) {
+          nameInput.value = ex.name;
+          showExerciseMuscles(id, ex.name);
+        }
+        // Replace the auto-added blank set with saved sets
+        const sc = document.getElementById('ex-sets-' + id);
+        if (sc) sc.innerHTML = '';
+        (ex.sets || [{ weight:'', reps:'', notes:'' }]).forEach((s, si) => {
+          addSetRow(id);
+          const sc2 = document.getElementById('ex-sets-' + id);
+          if (sc2) {
+            const row = sc2.children[sc2.children.length - 1];
+            const inputs = row.querySelectorAll('input');
+            if (inputs[0]) inputs[0].value = s.weight || '';
+            if (inputs[1]) inputs[1].value = s.reps || '';
+            if (inputs[2]) inputs[2].value = s.notes || '';
+          }
+        });
+      });
+      // Show restored indicator
+      const savedEl = document.getElementById('wm-autosave');
+      if (savedEl) { savedEl.textContent = '↩ Draft restored'; savedEl.classList.add('show'); setTimeout(() => { savedEl.textContent = '✓ Auto-saved'; savedEl.classList.remove('show'); }, 2500); }
+    } else {
+      addExerciseRow();
+    }
+  } catch(e) {
+    addExerciseRow();
+  }
+
   updateWorkoutTotals();
   // Update unit labels in modal
   const wUnit = weightUnit();
@@ -9149,6 +9271,87 @@ function saveWorkoutDraft() {
       if (savedEl) { savedEl.classList.add('show'); setTimeout(() => savedEl.classList.remove('show'), 1800); }
     } catch(e) {}
   }, 700);
+}
+
+// ── Open Workout from AI Plan ─────────────────
+function _parsePlanExercise(str) {
+  // Parse "Bench Press 3x10", "Squats - 4 sets × 8 reps", "Push-ups 3 sets", etc.
+  const setsRepsMatch = str.match(/(\d+)\s*[xX×]\s*(\d+)/);
+  const setsOnlyMatch = str.match(/(\d+)\s*sets?/i);
+  let sets = 3, reps = 10;
+  if (setsRepsMatch) {
+    sets = parseInt(setsRepsMatch[1]);
+    reps = parseInt(setsRepsMatch[2]);
+  } else if (setsOnlyMatch) {
+    sets = parseInt(setsOnlyMatch[1]);
+  }
+  // Extract name: strip sets/reps notation from the end
+  let name = str
+    .replace(/\s*[-–—:·•]+?\s*\d+\s*[xX×]\s*\d+.*$/, '')
+    .replace(/\s+\d+\s*[xX×]\s*\d+.*$/, '')
+    .replace(/\s+\d+\s*sets?.*$/i, '')
+    .replace(/[-–—:·•\s]+$/, '')
+    .trim();
+  return { name: name || str.trim(), sets: Math.min(sets, 10), reps };
+}
+
+function openWorkoutFromPlan(dayIdx) {
+  const day = _wpDays[dayIdx];
+  if (!day || !day.workout || day.workout.type === 'rest') return;
+
+  // Navigate to workout log (always log to today's date)
+  navigate('workout-log');
+
+  // Open the modal — this resets everything
+  openAddWorkout();
+
+  // Clear any auto-added rows from openAddWorkout
+  document.getElementById('exercise-rows-container').innerHTML = '';
+  exerciseRowCount = 0;
+  document.getElementById('no-exercises-msg').style.display = 'block';
+
+  // Set activity type
+  const actMap = { Weightlifting:'Weightlifting', Strength:'Weightlifting', Cardio:'Cardio', HIIT:'HIIT', Yoga:'Yoga', Swimming:'Swimming', Cycling:'Cycling', Running:'Cardio', Pilates:'Other', Crossfit:'HIIT' };
+  const act = actMap[day.workout.type] || 'Weightlifting';
+  selectedActivity = act;
+  document.querySelectorAll('.activity-chip').forEach(c => c.classList.toggle('active', c.textContent.trim() === act || c.textContent.includes(act)));
+
+  // Set workout name from plan
+  const nameEl = document.getElementById('wm-name');
+  if (nameEl) nameEl.value = day.workout.type + (day.workout.focus ? ' — ' + day.workout.focus : ' Workout');
+
+  // Add exercises from the plan
+  const planExercises = day.workout.exercises || [];
+  if (planExercises.length) {
+    planExercises.forEach(exStr => {
+      const parsed = _parsePlanExercise(exStr);
+      if (!parsed.name) return;
+      addExerciseRow();
+      const id = exerciseRowCount - 1;
+      const nameInput = document.getElementById('ex-name-' + id);
+      if (nameInput) { nameInput.value = parsed.name; showExerciseMuscles(id, parsed.name); }
+      // Replace the auto-added set with the planned number of sets
+      const sc = document.getElementById('ex-sets-' + id);
+      if (sc) sc.innerHTML = '';
+      for (let s = 0; s < parsed.sets; s++) {
+        addSetRow(id);
+        if (parsed.reps > 0) {
+          const sc2 = document.getElementById('ex-sets-' + id);
+          if (sc2 && sc2.lastChild) {
+            const repInput = sc2.lastChild.querySelectorAll('.set-input')[1];
+            if (repInput) repInput.value = parsed.reps;
+          }
+        }
+      }
+    });
+  } else {
+    addExerciseRow();
+  }
+
+  updateWorkoutTotals();
+  // Show a hint that this was loaded from the plan
+  const savedEl = document.getElementById('wm-autosave');
+  if (savedEl) { savedEl.textContent = '📋 Loaded from plan'; savedEl.classList.add('show'); setTimeout(() => { savedEl.textContent = '✓ Auto-saved'; savedEl.classList.remove('show'); }, 2500); }
 }
 
 function confirmAddWorkout() {
