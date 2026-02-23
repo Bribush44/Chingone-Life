@@ -735,6 +735,22 @@
         <div id="d-wp-no-plan" style="margin-top:8px;font-size:12px;color:var(--text-muted);">No AI plan generated yet. <span style="color:var(--green);font-weight:600;" onclick="event.stopPropagation();navigate('ai-plan')">Generate one →</span></div>
       </div>
 
+      <!-- Daily Lean Coach Tip -->
+      <div class="card" id="d-daily-tip-card" style="margin-bottom:16px;border-left:4px solid #10b981;background:linear-gradient(135deg,var(--surface),rgba(16,185,129,0.04));">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:26px;">🎯</span>
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.5px;">Daily Lean Tip</div>
+              <div style="font-size:11px;color:var(--text-muted);">From your Lean Coach · updates every day</div>
+            </div>
+          </div>
+          <button id="d-tip-refresh-btn" onclick="generateDailyTip(true)" style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text-muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;" onmouseover="this.style.borderColor='#10b981';this.style.color='#10b981'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">↺ New tip</button>
+        </div>
+        <div id="d-daily-tip-text" style="font-size:14px;line-height:1.7;color:var(--text);"></div>
+        <div id="d-tip-timestamp" style="font-size:10px;color:var(--text-muted);margin-top:8px;text-align:right;"></div>
+      </div>
+
       <!-- Daily Weigh-In card -->
       <div class="card" style="margin-bottom:16px;border-left:3px solid #a78bfa;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -3336,6 +3352,62 @@ function renderCoachChat() {
 }
 
 // ══════════════════════════════════════════════
+// DAILY LEAN TIP
+// ══════════════════════════════════════════════
+function renderDailyTip() {
+  const u = allUsers[currentUser];
+  if (!u) return;
+  const today = getTodayStr();
+  const tipEl = document.getElementById('d-daily-tip-text');
+  const tsEl  = document.getElementById('d-tip-timestamp');
+  if (!tipEl) return;
+  if (u.dailyTip && u.dailyTip.date === today && u.dailyTip.text) {
+    tipEl.textContent = u.dailyTip.text;
+    if (tsEl) tsEl.textContent = 'Generated today';
+  } else {
+    generateDailyTip(false);
+  }
+}
+
+async function generateDailyTip(force) {
+  const u = allUsers[currentUser];
+  if (!u) return;
+  const today = getTodayStr();
+  if (!force && u.dailyTip && u.dailyTip.date === today && u.dailyTip.text) return;
+
+  const tipEl = document.getElementById('d-daily-tip-text');
+  const tsEl  = document.getElementById('d-tip-timestamp');
+  const btn   = document.getElementById('d-tip-refresh-btn');
+  if (!tipEl) return;
+
+  tipEl.innerHTML = '<span style="display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:13px;"><span class="spinner" style="width:14px;height:14px;border-width:2px;display:inline-block;flex-shrink:0;"></span>Generating your tip for today…</span>';
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+
+  const fallbacks = [
+    "Small improvements every day — that's the kaizen way. Today, just focus on hitting your protein goal. One win builds momentum for the next.",
+    "Your body keeps score. Every logged meal, every workout, every hour of sleep is an investment compounding in your favor. Keep showing up.",
+    "Eliminate waste today. Before you eat something, ask: does this move me toward my goal? That one question is more powerful than any diet plan.",
+    "Consistency beats perfection every time. A 20-minute walk today beats a skipped 2-hour gym session. Do the smaller thing and keep the streak alive.",
+    "Recovery is not a reward — it's part of the work. Prioritize sleep tonight and your workout tomorrow will be a different experience entirely."
+  ];
+
+  try {
+    const context = buildCoachContext();
+    const prompt = `Based on this user's health data, write ONE short motivational tip for today. Make it specific to their actual numbers and progress — not generic advice. Keep it to 2-3 sentences. Write in Paul Akers' energetic, positive coaching voice. No bullet points, no headers, just a direct personal message.\n\n${context}`;
+    const tip = await _sendToCoach(buildCoachSystemPrompt(), [{ role: 'user', content: prompt }]);
+    u.dailyTip = { date: today, text: tip.trim() };
+    saveStorage();
+    tipEl.textContent = tip.trim();
+    if (tsEl) tsEl.textContent = 'Generated today';
+  } catch(e) {
+    const tip = fallbacks[new Date().getDay() % fallbacks.length];
+    tipEl.textContent = tip;
+    if (tsEl) tsEl.textContent = 'Daily tip';
+  }
+  if (btn) { btn.disabled = false; btn.textContent = '↺ New tip'; }
+}
+
+// ══════════════════════════════════════════════
 // INSTALL PAGE
 // ══════════════════════════════════════════════
 function renderInstallPage() {
@@ -4002,6 +4074,11 @@ function renderDashboard() {
     if (wpPreviewEl) wpPreviewEl.style.display = 'none';
     if (wpDayEl) wpDayEl.textContent = new Date().toLocaleDateString('en-US', { weekday:'long' });
   }
+
+  // Daily tip — only shown when viewing today
+  const tipCard = document.getElementById('d-daily-tip-card');
+  if (tipCard) tipCard.style.display = isToday ? 'block' : 'none';
+  if (isToday) renderDailyTip();
 }
 
 function getDayTotals(dateStr) {
