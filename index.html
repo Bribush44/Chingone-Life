@@ -52,13 +52,14 @@
     --radius-lg: 20px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+  html { height: 100%; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); height: 100%; overflow: hidden; }
 
   /* NOISE TEXTURE */
   body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; z-index: 9999; opacity: 0.4; }
 
   /* ── AUTH SCREEN ── */
-  #auth-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: radial-gradient(ellipse at 30% 50%, rgba(74,222,128,0.06) 0%, transparent 60%), radial-gradient(ellipse at 70% 20%, rgba(250,204,21,0.04) 0%, transparent 50%); }
+  #auth-screen { display: flex; align-items: center; justify-content: center; height: 100%; overflow-y: auto; padding: 20px; background: radial-gradient(ellipse at 30% 50%, rgba(74,222,128,0.06) 0%, transparent 60%), radial-gradient(ellipse at 70% 20%, rgba(250,204,21,0.04) 0%, transparent 50%); }
   .auth-box { width: 100%; max-width: 440px; }
   .auth-logo { font-family: 'Bebas Neue', sans-serif; font-size: 52px; letter-spacing: 3px; color: var(--green); text-shadow: 0 0 40px rgba(74,222,128,0.4); margin-bottom: 4px; }
   .auth-tagline { color: var(--text-dim); font-size: 14px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 40px; }
@@ -87,8 +88,8 @@
   .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
 
   /* ── APP LAYOUT ── */
-  #app { display: none; height: 100svh; overflow: hidden; }
-  #app.visible { display: flex; flex-direction: column; }
+  #app { display: none; height: 100%; }
+  #app.visible { display: flex; flex-direction: column; height: 100%; }
   .sidebar { display: none; width: 240px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); flex-direction: column; height: 100svh; overflow-y: auto; }
   .sidebar-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--green); padding: 20px 16px 12px; border-bottom: 1px solid var(--border); }
   .sidebar-user { padding: 12px 16px; border-bottom: 1px solid var(--border); }
@@ -102,8 +103,8 @@
   .nav-item.active { background: var(--green-glow); color: var(--green); }
   .nav-item .nav-icon { font-size: 18px; width: 22px; text-align: center; }
   .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); }
-  .main { width: 100%; overflow-y: auto; overflow-x: hidden; background: var(--bg); height: calc(100svh - 64px); min-height: 0; flex-shrink: 0; -webkit-overflow-scrolling: touch; }
-  .page { display: none; padding: 16px 14px 120px; max-width: 100%; width: 100%; box-sizing: border-box; }
+  .main { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; background: var(--bg); -webkit-overflow-scrolling: touch; }
+  .page { display: none; padding: 16px 14px 120px; width: 100%; box-sizing: border-box; }
   .page.active { display: block; }
   .page-title { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1px; line-height: 1; margin-bottom: 4px; }
   .page-sub { color: var(--text-dim); font-size: 14px; margin-bottom: 24px; }
@@ -306,9 +307,9 @@
   @media (min-width: 900px) {
     .sidebar { display: flex !important; }
     #app.visible { flex-direction: row !important; }
-    .main { height: 100svh !important; flex: 1 !important; width: auto !important; }
+    .main { flex: 1 !important; min-height: 0 !important; width: auto !important; }
     .bottom-tab-bar { display: none !important; }
-    .page { padding: 28px 32px 100px !important; max-width: 900px !important; }
+    .page { padding: 28px 32px 100px !important; max-width: 900px !important; margin-left: auto !important; margin-right: auto !important; }
     .page-title { font-size: 42px !important; }
     .stats-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 14px !important; }
     .ai-form-grid { grid-template-columns: 1fr 1fr !important; }
@@ -578,7 +579,7 @@
   <div class="sidebar">
     <div class="sidebar-logo" style="display:flex;align-items:baseline;gap:8px;">
     Chingone Life Tracker
-    <span id="version-badge" style="font-size:9px;font-weight:700;letter-spacing:0.4px;background:rgba(74,222,128,0.15);color:var(--green);border:1px solid rgba(74,222,128,0.3);border-radius:20px;padding:2px 6px;font-family:'DM Sans',sans-serif;">v1.2.0</span>
+    <span id="version-badge" style="font-size:9px;font-weight:700;letter-spacing:0.4px;background:rgba(74,222,128,0.15);color:var(--green);border:1px solid rgba(74,222,128,0.3);border-radius:20px;padding:2px 6px;font-family:'DM Sans',sans-serif;">v1.3.0</span>
   </div>
     <div class="sidebar-user">
       <div class="user-chip" onclick="navigate('users')">
@@ -3101,7 +3102,7 @@
 
 <script>
   // ── App Version ──────────────────────────────────────────────
-  const APP_VERSION = '1.2.0';
+  const APP_VERSION = '1.3.0';
   const APP_VERSION_DATE = '2026-02-23';
   // ────────────────────────────────────────────────────────────
   // Update version badges after DOM loads
@@ -3606,6 +3607,8 @@ function syncBottomTabs(page) {
 function navigate(page) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const mainEl = document.querySelector('.main');
+  if (mainEl) mainEl.scrollTop = 0;
   // Highlight the correct nav item by matching its onclick attribute
   document.querySelectorAll('.nav-item').forEach(n => {
     if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + page + "'")) {
