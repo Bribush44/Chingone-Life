@@ -178,6 +178,16 @@
   .source-tab.active { background: var(--green); color: #0d0f0e; border-color: var(--green); }
   .manual-badge { display: inline-block; padding: 2px 7px; border-radius: 8px; font-size: 10px; font-weight: 700; background: rgba(250,204,21,0.15); color: var(--accent); border: 1px solid rgba(250,204,21,0.3); margin-left: 6px; }
 
+  /* ── TOGGLE / SOURCE BUTTONS (used in food search, camera modes, etc.) ── */
+  .src-btn { padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text-dim); transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+  .src-btn:hover { border-color: var(--green); color: var(--text); }
+  .src-btn.src-active { background: var(--green); color: #0d0f0e; border-color: var(--green); }
+  /* ── SHOT TYPE BUTTONS (progress camera) ── */
+  .shot-btn { flex: 1; padding: 12px 8px; border-radius: var(--radius); border: 2px solid var(--border); background: var(--surface2); color: var(--text-dim); cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s; font-family: 'DM Sans', sans-serif; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .shot-btn .shot-icon { font-size: 22px; line-height: 1; }
+  .shot-btn:hover { border-color: var(--green); color: var(--text); }
+  .shot-btn.src-active { border-color: var(--green); background: var(--green-glow); color: var(--green); }
+
   /* ── WORKOUT LOG ── */
   .workout-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
   .workout-card-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
@@ -2350,12 +2360,19 @@
                 </div>
               </div>
               <!-- Shot type selector -->
-              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-                <button class="src-btn src-active" id="pg-shot-front" onclick="setPgShot('Front')">Front</button>
-                <button class="src-btn" id="pg-shot-side" onclick="setPgShot('Side')">Side</button>
-                <button class="src-btn" id="pg-shot-back" onclick="setPgShot('Back')">Back</button>
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);margin-bottom:8px;">Select Shot Type</div>
+              <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <button class="shot-btn src-active" id="pg-shot-front" onclick="setPgShot('Front')">
+                  <span class="shot-icon">🧍</span>Front
+                </button>
+                <button class="shot-btn" id="pg-shot-side" onclick="setPgShot('Side')">
+                  <span class="shot-icon">↪️</span>Side
+                </button>
+                <button class="shot-btn" id="pg-shot-back" onclick="setPgShot('Back')">
+                  <span class="shot-icon">🔄</span>Back
+                </button>
               </div>
-              <button class="btn btn-primary btn-full" id="pg-snap-btn" onclick="snapProgressPhoto()" style="display:none;font-size:14px;padding:12px;">📸 Take Photo (5s timer)</button>
+              <button class="btn btn-primary btn-full" id="pg-snap-btn" onclick="snapProgressPhoto()" style="display:none;font-size:15px;padding:14px;">📸 Front Photo — 5s Timer</button>
             </div>
           </div>
         </div>
@@ -5377,6 +5394,29 @@ function setStatus(id, html) {
   if (el) el.innerHTML = html;
 }
 
+// ── Audio beep helper ─────────────────────────
+function _playBeep(freq, dur, vol, type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol || 0.35, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + dur);
+    osc.onended = () => { try { ctx.close(); } catch(e) {} };
+  } catch(e) {}
+}
+function _playShutter() {
+  // Two quick square-wave clicks to mimic a camera shutter
+  _playBeep(800, 0.04, 0.6, 'square');
+  setTimeout(() => _playBeep(400, 0.06, 0.4, 'square'), 55);
+}
+
 // ── Countdown timer utility (for weight photo shots) ──
 function startCountdown(secs, btn, onDone) {
   if (!btn) { onDone(); return; }
@@ -5385,7 +5425,7 @@ function startCountdown(secs, btn, onDone) {
   btn.disabled = true;
   let remaining = secs;
 
-  // Overlay countdown on video if available (looks great)
+  // Overlay countdown on video
   let overlay = document.getElementById('_countdown_overlay');
   if (!overlay) {
     overlay = document.createElement('div');
@@ -5401,12 +5441,19 @@ function startCountdown(secs, btn, onDone) {
     overlay.innerHTML = '<div style="font-family:Bebas Neue,sans-serif;font-size:min(40vw,200px);color:#fff;text-shadow:0 0 40px rgba(255,255,255,0.5);line-height:1;animation:pulse 1s ease;">' + remaining + '</div>';
 
     if (remaining <= 0) {
+      _playShutter();
       overlay.style.display = 'none';
       btn.textContent  = origText;
       btn.style.background = origColor;
       btn.disabled = false;
       onDone();
       return;
+    }
+    // Audible beep: higher pitch for last 2 seconds
+    if (remaining <= 2) {
+      _playBeep(880, 0.12, 0.5);
+    } else {
+      _playBeep(440, 0.12, 0.3);
     }
     remaining--;
     setTimeout(tick, 1000);
@@ -7366,6 +7413,8 @@ function setPgShot(type) {
     const btn = document.getElementById('pg-shot-' + s.toLowerCase());
     if (btn) btn.classList.toggle('src-active', s === type);
   });
+  const snapBtn = document.getElementById('pg-snap-btn');
+  if (snapBtn) snapBtn.textContent = '📸 ' + type + ' Photo — 5s Timer';
 }
 
 function snapProgressPhoto() {
