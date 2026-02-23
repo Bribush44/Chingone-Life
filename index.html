@@ -88,8 +88,8 @@
 
   /* ── APP LAYOUT ── */
   #app { display: none; }
-  #app.visible { display: block; position: fixed; inset: 0; }
-  .sidebar { display: none; position: fixed; top: 0; left: 0; bottom: 0; width: 240px; background: var(--surface); border-right: 1px solid var(--border); flex-direction: column; overflow-y: auto; z-index: 100; }
+  #app.visible { display: block; }
+  .sidebar { display: none; position: fixed; top: 0; left: 0; bottom: 0; width: 240px; background: var(--surface); border-right: 1px solid var(--border); flex-direction: column; overflow-y: auto; z-index: 200; }
   .sidebar-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--green); padding: 20px 16px 12px; border-bottom: 1px solid var(--border); }
   .sidebar-user { padding: 12px 16px; border-bottom: 1px solid var(--border); }
   .user-chip { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; cursor: pointer; transition: background 0.15s; }
@@ -102,7 +102,7 @@
   .nav-item.active { background: var(--green-glow); color: var(--green); }
   .nav-item .nav-icon { font-size: 18px; width: 22px; text-align: center; }
   .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); }
-  .main { position: absolute; top: 0; left: 0; right: 0; bottom: 64px; overflow-y: scroll; overflow-x: hidden; background: var(--bg); -webkit-overflow-scrolling: touch; }
+  .main { position: fixed; top: 0; left: 0; right: 0; bottom: 64px; overflow-y: scroll; overflow-x: hidden; background: var(--bg); -webkit-overflow-scrolling: touch; z-index: 1; }
   .page { display: none; padding: 16px 14px 32px; width: 100%; box-sizing: border-box; }
   .page.active { display: block; }
   .page-title { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1px; line-height: 1; margin-bottom: 4px; }
