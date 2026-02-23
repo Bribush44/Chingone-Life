@@ -52,7 +52,7 @@
     --radius-lg: 20px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
 
   /* NOISE TEXTURE */
   body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; z-index: 9999; opacity: 0.4; }
@@ -86,7 +86,7 @@
   .btn-sm { padding: 8px 14px; font-size: 13px; border-radius: 8px; }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
 
-  /* ── APP LAYOUT ── */
+  /* ── APP LAYOUT — mobile: body scrolls; tab bar fixed at bottom ── */
   #app { display: none; }
   #app.visible { display: block; }
   .sidebar { display: none; position: fixed; top: 0; left: 0; bottom: 0; width: 240px; background: var(--surface); border-right: 1px solid var(--border); flex-direction: column; overflow-y: auto; z-index: 200; }
@@ -102,8 +102,8 @@
   .nav-item.active { background: var(--green-glow); color: var(--green); }
   .nav-item .nav-icon { font-size: 18px; width: 22px; text-align: center; }
   .sidebar-bottom { padding: 16px; border-top: 1px solid var(--border); }
-  .main { position: fixed; top: 0; left: 0; right: 0; bottom: 64px; overflow-y: scroll; overflow-x: hidden; background: var(--bg); -webkit-overflow-scrolling: touch; z-index: 1; }
-  .page { display: none; padding: 16px 14px 32px; width: 100%; box-sizing: border-box; }
+  .main { display: block; width: 100%; }
+  .page { display: none; padding: 16px 14px 90px; width: 100%; box-sizing: border-box; }
   .page.active { display: block; }
   .page-title { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1px; line-height: 1; margin-bottom: 4px; }
   .page-sub { color: var(--text-dim); font-size: 14px; margin-bottom: 24px; }
@@ -302,10 +302,12 @@
   /* ── GOOGLE SHEETS ── */
   .sheets-connected { display: flex; align-items: center; gap: 10px; background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); border-radius: var(--radius); padding: 12px 16px; font-size: 14px; color: var(--green); margin-bottom: 20px; }
 
-  /* ── DESKTOP LAYOUT (sidebar + wider content) ── */
+  /* ── DESKTOP LAYOUT ── */
   @media (min-width: 900px) {
-    .sidebar { display: flex !important; }
-    .main { left: 240px !important; bottom: 0 !important; }
+    body { overflow: hidden; }
+    #app.visible { display: flex; flex-direction: row; height: 100vh; }
+    .sidebar { display: flex !important; position: relative; top: auto; left: auto; bottom: auto; height: 100vh; }
+    .main { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
     .bottom-tab-bar { display: none !important; }
     .page { padding: 28px 32px 60px !important; max-width: 900px !important; margin-left: auto !important; margin-right: auto !important; }
     .page-title { font-size: 42px !important; }
@@ -3677,6 +3679,7 @@ function syncBottomTabs(page) {
 function navigate(page) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  window.scrollTo(0, 0);
   const mainEl = document.querySelector('.main');
   if (mainEl) mainEl.scrollTop = 0;
   // Highlight the correct nav item by matching its onclick attribute
@@ -5882,23 +5885,38 @@ function parseWeekFromPlan(planText) {
   return days;
 }
 
-function parseMealsFromText(text, dayIdx, fullPlan) {
+function parseMealsFromText(text, dayIdx) {
   const meals = [];
-  const lines  = text.split('\n');
+  const lines = text.split('\n');
   const mealTypes = ['breakfast','lunch','dinner','snack','post-workout','pre-workout'];
+  const clean = s => s.replace(/^[\s\-–*•#\*_]+|[\*_]+$/g, '').trim();
 
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const lower = line.toLowerCase();
     for (const mt of mealTypes) {
       if (lower.includes(mt)) {
-        // Extract anything after the colon if present, else use the rest of the line
+        // Try to get description from same line (after colon)
         const colonIdx = line.indexOf(':');
-        let description = colonIdx >= 0 ? line.slice(colonIdx + 1).trim() : line.replace(/breakfast|lunch|dinner|snack|post.workout|pre.workout/gi, '').trim();
-        description = description.replace(/^[\s\-–*•]+/, '').trim();
+        let description = colonIdx >= 0
+          ? clean(line.slice(colonIdx + 1))
+          : clean(line.replace(new RegExp(mt, 'gi'), ''));
+
+        // If nothing on this line, look at the next non-empty line
+        if (description.length <= 3) {
+          for (let j = i + 1; j < Math.min(i + 4, lines.length); j++) {
+            const next = clean(lines[j]);
+            if (next.length > 3 && !mealTypes.some(t => lines[j].toLowerCase().includes(t))) {
+              description = next;
+              break;
+            }
+          }
+        }
+
         if (description.length > 3) {
-          // Parse macros from same or next line
-          const macros = extractMacros(line);
-          meals.push({ type: mt, name: description.slice(0, 80), macros });
+          // Search a window of lines for macros
+          const window = lines.slice(i, Math.min(i + 4, lines.length)).join(' ');
+          meals.push({ type: mt, name: description.slice(0, 100), macros: extractMacros(window) });
         }
         break;
       }
