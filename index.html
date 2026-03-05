@@ -70,14 +70,14 @@ const _fbDb   = firebase.firestore();
     --radius-lg: 20px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
 
   /* NOISE TEXTURE */
   body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; z-index: 9999; opacity: 0.4; }
 
   /* ── AUTH SCREEN ── */
-  #auth-screen { display: flex; align-items: flex-start; justify-content: center; height: 100vh; overflow-y: auto; padding: 20px; background: radial-gradient(ellipse at 30% 50%, rgba(74,222,128,0.06) 0%, transparent 60%), radial-gradient(ellipse at 70% 20%, rgba(250,204,21,0.04) 0%, transparent 50%); }
-  .auth-box { width: 100%; max-width: 440px; margin: auto; }
+  #auth-screen { display: flex; align-items: flex-start; justify-content: center; min-height: 100vh; padding: 20px; background: radial-gradient(ellipse at 30% 50%, rgba(74,222,128,0.06) 0%, transparent 60%), radial-gradient(ellipse at 70% 20%, rgba(250,204,21,0.04) 0%, transparent 50%); }
+  .auth-box { width: 100%; max-width: 440px; margin: 0 auto; }
   .auth-logo { font-family: 'Bebas Neue', sans-serif; font-size: 52px; letter-spacing: 3px; color: var(--green); text-shadow: 0 0 40px rgba(74,222,128,0.4); margin-bottom: 4px; }
   .auth-tagline { color: var(--text-dim); font-size: 14px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 40px; }
   .auth-tabs { display: flex; gap: 0; margin-bottom: 28px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
@@ -2694,7 +2694,7 @@ const _fbDb   = firebase.firestore();
       <div class="page-sub">Select a profile or create a new one</div>
       <div class="users-grid" id="users-grid"></div>
       <div style="margin-top:20px;">
-        <button class="btn btn-outline" onclick="switchAuthTab('register'); document.getElementById('app').classList.remove('visible'); document.getElementById('auth-screen').style.display='flex'; document.getElementById('app').classList.remove('visible');">+ Add New User</button>
+        <button class="btn btn-outline" onclick="switchAuthTab('register'); document.getElementById('app').classList.remove('visible'); document.body.style.overflow=''; document.getElementById('auth-screen').style.display='flex';">+ Add New User</button>
       </div>
     </div>
 
@@ -4021,6 +4021,7 @@ function doLogout() {
   currentUser = null;
   localStorage.removeItem('vt_current');
   document.getElementById('app').classList.remove('visible');
+  document.body.style.overflow = '';
   document.getElementById('auth-screen').style.display = 'flex';
 }
 
@@ -4220,6 +4221,7 @@ async function _fbDeleteRecipe(recipeId) {
 }
 
 function launchApp() {
+  document.body.style.overflow = 'hidden';
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
   refreshSidebarUser();
